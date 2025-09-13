@@ -1,0 +1,151 @@
+---
+format: revealjs
+---
+
+## 1.1 Linear Algebra Q1
+
+Let A be a 2x2 matrix with the following rows [1 0] [2 3] where C is the inverse of B for B a 2x2 matrix with the rows [5 0] [1 1]. Find k+l+m+n for D = CA with rows [k l] [m n]
+
+- A: 2
+- B: -2
+- C: 5
+- D: -5
+- E: 0
+
+## 1.2 Linear Algebra Q2
+
+Select all that are true for a square matrix A:
+
+- 1. A is singular if detA = 0
+- 2. A is singular if A inverse is not defined
+- 3. If A is triangular, determinant of a triangular matrix is the inverse of the product of the values on the main diagonal
+- 4. If A equals to identity matrix multiplying with A won't change vector v.  
+
+## 2.1 Numpy Q1
+
+Select all that are true:
+Assume NumPy arrays `x` and `y` are multiplied element-wise via `x * y`,
+where X and Y are the shapes of `x` and `y`, respectively.
+For which pairs (X, Y) will NumPy work without an issue?
+
+- A: X = (12, 11); Y = (12, )
+- B: X = (1, 12); Y = (12, 11)
+- C: X = (12, 1); Y = (12, 12)
+
+## 2.2 Numpy Q2
+
+What is the SHAPE of an array in NumPy?
+
+- A: The shape is the number of elements in each dimension.
+- B: The shape is the number of columns.
+- C: The shape is the number of rows.
+
+## 3.1 PCA Q1
+
+Which of the following does PCA find?
+
+- A: The line that maximizes the contruction error
+- B: The line that has the smallest projection error
+- C: The line that has the greatest projection error
+- D: The line that minimizes the projection variance
+
+## 3.2 PCA Q2
+
+Why do we need dimension reduction? Select all that apply.
+
+- 1. Less data means less storage
+- 2. Removes noise & redundant features
+- 3. It always results being computationally less intensive than the original
+- 4. Always preserves important features of the model
+
+## Explanation for 1.1
+<div style="font-size:70%">
+Correct Answer is: **C**
+
+**Explanation:**
+
+- A = [1 0] [2 3] 
+- C = 0.2 * [1  0] [-1  5] = [0.2  0] [-0.2  1]
+- **k** = 0.2 * 1 = 0.2;  **l** = 0 * 0
+- **m** = -0.2 + 2 = 1.8; **n** = 1 * 3 = 3
+- **k+l+m+n** = 0.2 + 1.8 + 3 = 5
+
+**Why care?**  It tests your ability to combine matrix inversion and multiplication, a core linear algebra skill.
+</div>
+
+## Explanation for 1.2
+<div style="font-size:70%">
+Correct Answer is: **1,2 and 4**
+
+**Explanation:**
+
+- 1. By definition, a square matrix is singular when its determinant is zero. Therefore, **true**
+- 2. "Inverse not defined" means the matrix is not invertible, i.e. singular. Therefore, **true**
+- 3. The determinant of a triangular matrix is the product of the diagonal entries, not the inverse of that product. Therefore, **false**
+- 4. By definition, Iv = v. Therefore, **true**
+
+**Why care?**  
+Knowing these properties is essential to recognize when matrices are invertible.
+</div>
+
+## Explanation for 2.1
+<div style="font-size:70%">
+Correct Answer is: **C**
+
+**Explanation:**
+
+- Case A (Not compatible)  
+  Neither trailing nor leading dimensions match nor equal 1  
+
+- Case B (Not compatible)  
+  Neither trailing nor leading dimensions match nor equal 1  
+
+- Case C (Compatible)  
+  **X = (12, 1); Y = (12, 12)**  
+  1 vs 12 → Matches & 12 vs 12 → Matches  
+
+**Why care?**  
+It checks your understanding of NumPy broadcasting, which is crucial for efficient coding.
+</div>
+
+## Explanation for 2.2
+<div style="font-size:70%">
+Correct Answer is: **A**
+
+**Explanation:**
+
+- In NumPy, the shape of an array is a tuple that gives the size along each dimension. Options B and C are only partially correct.
+
+**Why care?**  
+Understanding shape is foundational for manipulating arrays in NumPy.
+</div>
+
+## Explanation for 3.1
+<div style="font-size:70%">
+Correct Answer is: **B**
+
+**Explanation:**
+
+- Case A: **Wrong**: PCA minimizes the construction error.  
+- Case B: **Right**: PCA aims to find the line that has the smallest projection error.  
+- Case C: **Wrong**: PCA aims to find the line that has the smallest projection error.  
+- Case D: **Wrong**: PCA maximizes the projection variance.  
+
+**Why care?**  
+It highlights the geometric intuition of PCA and why it preserves the most information.
+</div>
+
+## Explanation for 3.2
+<div style="font-size:70%">
+Correct Answer is: **1 and 2**
+
+**Explanation:**
+
+- 1. Reducing dimensions reduces the amount of data stored. Therefore, **true**  
+- 2. Dimensionality reduction (like PCA) can eliminate correlated or noisy features. Therefore, **true**  
+- 3. Some dimensionality reduction steps themselves can be computationally expensive. Therefore, **false**  
+- 4. Some important features can be lost depending on the method and reduction. Therefore, **false**  
+
+**Why care?**  
+Dimension reduction is key for handling big data efficiently while improving model clarity.
+</div>
