@@ -1,0 +1,193 @@
+---
+format:
+    revealjs:
+        width: 1600
+        height: 900
+        scrollable: true
+---
+
+## Power Iteration - Code
+:::: {.columns}
+::: {.column width="100%"}
+
+```python
+A = np.array([[2, 1], [1, 2]])
+x = np.array([[1, 2]]).T
+tolerance = 1e-5
+max_iter = 50
+
+last_eigval = 0
+
+for i in range(max_iter):
+
+    x = A * x / np.linalg.norm(A * x) 
+    lam = (x.T @ A @ x) / (x.T @ x)
+    if np.abs(eigval - last_eigval) < tolerance:
+        break
+
+    last_eigval = eigval
+
+```
+:::
+::::
+
+## Power Iteration - Bugs
+:::: {.columns}
+::: {.column width="50%"}
+
+```python
+A = np.array([[2, 1], [1, 2]])
+x = np.array([[1, 2]]).T
+tolerance = 1e-5
+max_iter = 50
+
+last_eigval = 0
+
+for i in range(max_iter):
+
+    x = A * x / np.linalg.norm(A * x) # Bug
+    lam = (x.T @ A @ x) / (x.T @ x)
+    if np.abs(eigval - last_eigval) < tolerance:
+        break
+
+    last_eigval = eigval
+```
+:::
+::: {.column width="50%"}
+- **What it is**: The code uses the `*` operator, which performs element-wise multiplication in NumPy, not the standard matrix product.
+- **Why it's wrong**: The mathematical definition of a matrix product is $(AB)_{ij} = \sum_{k} A_{ik} B_{kj}$. The `*` operator computes $C_{ij} = A_{ij} \cdot B_{ij}$,which is a different operation (the Hadamard product).
+
+- **Manifestation**: Using * instead of @ returns mathematically incorrect results.
+:::
+::::
+
+
+
+## Power Iteration - Explanation
+:::: {.columns}
+::: {.column width="50%"}
+
+```python
+A = np.array([[2, 1], [1, 2]])
+x = np.array([[1, 2]]).T
+tolerance = 1e-5
+max_iter = 50
+
+last_eigval = 0
+
+for i in range(max_iter):
+
+    # Bug 1 Fix - replace * with @ to perform matrix multiplication
+    x = A @ x / np.linalg.norm(A @ x)
+    lam = (x.T @ A @ x) / (x.T @ x)
+    if np.abs(eigval - last_eigval) < tolerance:
+        break
+
+    last_eigval = eigval
+```
+:::
+::: {.column width="50%"}
+- **Why it's correct**: The `@` operator was introduced in Python 3.5 specifically for matrix multiplication. It correctly implements the $C_{ij} = \sum_k A_{ik} B_{kj}$ definition, producing the expected linear algebraic result.
+
+- **Importance**: Distinguishing between element-wise operations and matrix operations is fundamental in scientific computing. Using the wrong operator can lead to silent, errors hard to debug.
+
+:::
+::::
+
+## PCA - Code
+:::: {.columns}
+::: {.column width="100%"}
+
+```python
+from sklearn.datasets import load_sample_image
+import numpy as np
+
+flower = load_sample_image("flower.jpg")
+gray_flo = flower[:, :, 0] / 255.0
+X_centered = gray_flo - np.mean(gray_flo, axis=0)
+cov = np.cov(X_centered, rowvar=False)
+eigvals, eigvecs = np.linalg.eigh(cov)
+X_pca = np.dot(X_centered, eigvecs)
+
+```
+:::
+::::
+
+## PCA - Bugs
+:::: {.columns}
+::: {.column width="50%"}
+
+```python
+from sklearn.datasets import load_sample_image
+import numpy as np
+
+flower = load_sample_image("flower.jpg")
+gray_flo = flower[:, :, 0] / 255.0
+X_centered = gray_flo - np.mean(gray_flo, axis=0)
+cov = np.cov(X_centered, rowvar=False)
+eigvals, eigvecs = np.linalg.eigh(cov) # Bug 1
+
+X_pca = np.dot(X_centered, eigvecs) # Bug 2
+```
+:::
+::: {.column width="50%"}
+
+**Bug 1**
+
+- **What it is**: np.linalg.eigh assumes the covariance matrix is perfectly symmetric. In practice, floating-point errors invalidate this assumption.
+
+- **Why it's wrong**: PCA expects non-negative eigenvalues; negative or unstable results break interpretation.
+
+- **Manifestation**: Unsorted eigenvalues cause PCA to use the wrong components, so variance is not maximized in the first dimensions.
+
+**Bug 2**
+
+- **What it is**: X_centered is treated as (n_samples=rows, n_features=columns), so PCA is only applied along image rows.
+
+- **Why it's wrong**: Wrong version treats each image row as one sample, ignoring the full 2D structure of the image.
+
+- **Manifestation**: Projecting onto all eigenvectors reproduces the original data with no dimensionality reduction.
+
+:::
+::::
+
+
+## PCA - Explanation
+:::: {.columns}
+::: {.column width="50%"}
+
+```python
+from sklearn.datasets import load_sample_image
+import numpy as np
+
+flower = load_sample_image("flower.jpg")
+gray_flo = flower[:, :, 0] / 255.0
+X_centered = gray_flo - np.mean(gray_flo, axis=0)
+cov = np.cov(X_centered, rowvar=False)
+eigvals, eigvecs = np.linalg.eigh(cov) 
+
+# Bug 1 Fix - Sorting the eigenvalues to ensure the right PC ordering
+
+idx = np.argsort(eigvals)[::-1]
+eigvals = eigvals[idx]
+eigvecs = eigvecs[:, idx]
+
+# Bug 2 Fix - Apply the dimensionality reduction using the top k values
+k = 50
+X_pca = np.dot(X_centered, eigvecs[:, :k])
+```
+:::
+::: {.column width="50%"}
+**Bug 1**
+
+- **Why it's correct**: Sorting eigenvalues ensures the first principal component corresponds to the direction of maximum variance.
+
+- **Importance**: Without sorting, the components may be used in the wrong order, leading to incorrect results when reducing dimensions.
+
+**Bug 2**
+
+- **Why it's correct**: Selecting only the top-k eigenvectors preserves the directions with the most variance which is the core of PCA’s dimensionality reduction.
+
+- **Importance**: Without reducing dimensions, PCA would simply reconstruct the original data with no gain. 
+:::
+::::
